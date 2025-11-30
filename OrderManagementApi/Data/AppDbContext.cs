@@ -24,7 +24,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Order>()
             .Property(o => o.Value)
-            .HasColumnType("decimal(18,2");
+            .HasColumnType("decimal(18,2)");
 
         modelBuilder.Entity<Item>()
             .Property(i => i.Price)
