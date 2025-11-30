@@ -50,7 +50,7 @@ namespace OrderManagementApi.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderId");
 
