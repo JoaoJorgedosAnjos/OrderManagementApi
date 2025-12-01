@@ -57,25 +57,9 @@ public class OrderService : IOrderService
                 .Include(o => o.Items)
                 .FirstOrDefaultAsync(o => o.OrderId == id);
 
-            if (orderEntity == null)
-            {
-                return null;
-            }
+            if (orderEntity == null) return null;
 
-            var orderDto = new OrderReadDto
-            {
-                OrderId = orderEntity.OrderId,
-                Value = orderEntity.Value,
-                CreationDate = orderEntity.CreationDate,
-
-                Items = orderEntity.Items.Select(i => new ItemReadDto()
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Price
-                }).ToList()
-            };
-            return orderDto;
+            return MapToDto(orderEntity);
         }
         catch (Exception e)
         {
@@ -90,23 +74,27 @@ public class OrderService : IOrderService
             .Include(o => o.Items)
             .ToListAsync();
 
-        if (orderEntities.Count == 0)
-        {
-            return new List<OrderReadDto>();
-        }
+        if (orderEntities.Count == 0) return new List<OrderReadDto>();
 
         return orderEntities
-            .Select(o => new OrderReadDto
+            .Select(o => MapToDto(o))
+            .ToList();
+    }
+
+    private OrderReadDto MapToDto(Order orderEntity)
+    {
+        return new OrderReadDto
+        {
+            OrderId = orderEntity.OrderId,
+            Value = orderEntity.Value,
+            CreationDate = orderEntity.CreationDate,
+
+            Items = orderEntity.Items.Select(i => new ItemReadDto
             {
-                OrderId = o.OrderId,
-                Value = o.Value,
-                CreationDate = o.CreationDate,
-                Items = o.Items.Select(i => new ItemReadDto
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Price
-                }).ToList()
-            }).ToList();
+                ProductId = i.ProductId,
+                Quantity = i.Quantity,
+                Price = i.Price
+            }).ToList()
+        };
     }
 }
