@@ -1,3 +1,4 @@
+using System.Collections;
 using OrderManagementApi.Data;
 using OrderManagementApi.Models.DTOs;
 using OrderManagementApi.Models.Entities;
@@ -46,5 +47,66 @@ public class OrderService : IOrderService
             Console.WriteLine($"Erro ao criar pedido: {e.Message}");
             return false;
         }
+    }
+
+    public async Task<OrderReadDto?> GetOrderByIdAsync(string id)
+    {
+        try
+        {
+            var orderEntity = await _context.Orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+
+            if (orderEntity == null)
+            {
+                return null;
+            }
+
+            var orderDto = new OrderReadDto
+            {
+                OrderId = orderEntity.OrderId,
+                Value = orderEntity.Value,
+                CreationDate = orderEntity.CreationDate,
+
+                Items = orderEntity.Items.Select(i => new ItemReadDto()
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+            return orderDto;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Erro ao buscar pedido: {e.Message}");
+            return null;
+        }
+    }
+
+    public async Task<IEnumerable<OrderReadDto>> GetAllOrdersAsync()
+    {
+        var orderEntities = await _context.Orders
+            .Include(o => o.Items)
+            .ToListAsync();
+
+        if (orderEntities.Count == 0)
+        {
+            return new List<OrderReadDto>();
+        }
+
+        return orderEntities
+            .Select(o => new OrderReadDto
+            {
+                OrderId = o.OrderId,
+                Value = o.Value,
+                CreationDate = o.CreationDate,
+                Items = o.Items.Select(i => new ItemReadDto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            }).ToList();
     }
 }

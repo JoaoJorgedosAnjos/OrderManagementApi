@@ -35,4 +35,25 @@ public class OrderConttroler : ControllerBase
             return StatusCode(500, $"Erro interno: {e.Message}");
         }
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<OrderDto>> GetOrderById([FromRoute] string id)
+    {
+        var orderDto = await _service.GetOrderByIdAsync(id);
+
+        if (orderDto == null)
+        {
+            return NotFound(new { message = "Pedido não encontrado." });
+        }
+
+        return Ok(orderDto);
+    }
+
+    [HttpGet("list")]
+    public async Task<ActionResult<List<OrderReadDto>>> GetAllOrders()
+    {
+        var orders = await _service.GetAllOrdersAsync();
+      
+        return Ok(orders);
+    }
 }
