@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManagementApi.Data;
+using OrderManagementApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
-
 builder.Services.AddControllers();
+builder.Services.AddScoped<IOrderService, OrderService>();
 //Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
