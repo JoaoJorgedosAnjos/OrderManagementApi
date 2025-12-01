@@ -92,6 +92,17 @@ public class OrderService : IOrderService
         return true;
     }
 
+    public async Task<bool> DeleteOrderAsync(string id)
+    {
+        var orderEntity = await SearchOrderWithItens(id);
+
+        if (orderEntity == null) return false;
+
+        _context.Orders.Remove(orderEntity);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     private Item MapToItemEntity(ItemDto dto)
     {
         return new Item

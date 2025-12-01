@@ -58,14 +58,24 @@ public class OrderConttroler : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateOrder(string id, [FromBody] OrderDto dto)
+    public async Task<IActionResult> UpdateOrderById(string id, [FromBody] OrderDto dto)
     {
         if (id != dto.numeroPedido) return BadRequest("Pedido não encontrado.");
-        
+
         var updated = await _service.UpdateOrderAsync(id, dto);
-        
+
         if (!updated) return NotFound();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteOrderById(string? id)
+    {
+        if (id == null) return BadRequest("Pedido não encontrado.");
+        var deleted = await _service.DeleteOrderAsync(id);
         
+        if (!deleted) return NotFound();
         return NoContent();
     }
 }
