@@ -10,5 +10,5 @@ public interface IOrderService
     Task<OrderReadDto?> GetOrderByIdAsync(string id);
 
     Task<IEnumerable<OrderReadDto>> GetAllOrdersAsync();
-    //Task<bool> UpdateOrderAsync(string id,OrderDto dto);
+    Task<bool> UpdateOrderAsync(string id,OrderDto dto);
 }

@@ -29,13 +29,7 @@ public class OrderService : IOrderService
 
             foreach (var itemDto in dto.Items)
             {
-                var newItem = new Item
-                {
-                    ProductId = int.Parse(itemDto.idItem),
-                    Quantity = itemDto.quantidadeItem,
-                    Price = itemDto.valorItem
-                };
-                newOrder.Items.Add(newItem);
+                newOrder.Items.Add(MapToItemEntity(itemDto));
             }
 
             _context.Orders.Add(newOrder);
@@ -53,9 +47,7 @@ public class OrderService : IOrderService
     {
         try
         {
-            var orderEntity = await _context.Orders
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
+            var orderEntity = await SearchOrderWithItens(id);
 
             if (orderEntity == null) return null;
 
@@ -79,6 +71,42 @@ public class OrderService : IOrderService
         return orderEntities
             .Select(o => MapToDto(o))
             .ToList();
+    }
+
+    public async Task<bool> UpdateOrderAsync(string id, OrderDto dto)
+    {
+        var orderEntity = await SearchOrderWithItens(id);
+
+        if (orderEntity == null) return false;
+
+        orderEntity.Value = dto.valorTotal;
+        orderEntity.CreationDate = dto.dataCriacao;
+        orderEntity.Items.Clear();
+
+        foreach (var itemDto in dto.Items)
+        {
+            orderEntity.Items.Add(MapToItemEntity(itemDto));
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    private Item MapToItemEntity(ItemDto dto)
+    {
+        return new Item
+        {
+            ProductId = int.Parse(dto.idItem),
+            Quantity = dto.quantidadeItem,
+            Price = dto.valorItem
+        };
+    }
+
+    private async Task<Order?> SearchOrderWithItens(string id)
+    {
+        return await _context.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.OrderId == id);
     }
 
     private OrderReadDto MapToDto(Order orderEntity)

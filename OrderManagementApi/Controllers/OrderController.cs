@@ -53,7 +53,19 @@ public class OrderConttroler : ControllerBase
     public async Task<ActionResult<List<OrderReadDto>>> GetAllOrders()
     {
         var orders = await _service.GetAllOrdersAsync();
-      
+
         return Ok(orders);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateOrder(string id, [FromBody] OrderDto dto)
+    {
+        if (id != dto.numeroPedido) return BadRequest("Pedido não encontrado.");
+        
+        var updated = await _service.UpdateOrderAsync(id, dto);
+        
+        if (!updated) return NotFound();
+        
+        return NoContent();
     }
 }
